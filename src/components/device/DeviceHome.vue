@@ -1,25 +1,20 @@
 <template>
-  <el-row class="ark-home">
-    <ark-header></ark-header>
-    <ark-content></ark-content>
-  </el-row>
+    <el-row class="DeviceHomePage">
+        <el-col :span="24">DeviceHomePage</el-col>
+    </el-row>
 </template>
 
 <script>
-    import arkHeader from '../Header.vue'
-    import arkContent from '../Content.vue'
-
     export default {
-        name: 'DeviceHome',
-        components: { arkHeader, arkContent }
+        name: 'HostList',
+        data() {
+            return {
+                msg: 'HostList'
+            }
+        }
     }
 </script>
 
-<style>
-  .ark-home {
-    position: absolute;
-		top: 0px;
-		bottom: 0px;
-		width: 100%;
-  }
+<style lang="less">
+
 </style>

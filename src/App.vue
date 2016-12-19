@@ -13,7 +13,7 @@
     }
 </script>
 
-<style lang="scss">
+<style lang="less">
     @import "../node_modules/font-awesome/css/font-awesome.min.css";
     @import "../node_modules/flex.css/dist/flex.css";
     .bounce-enter-active {

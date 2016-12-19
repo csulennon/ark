@@ -4,15 +4,15 @@
             <img src="../assets/logo.png" class="logo"> <span>Digital<i style="color:#20a0ff">ARK</i></span>
         </el-col>
         <el-col :span="20">
-            <el-menu theme="dark" default-active="1" class="ark-top-menu" mode="horizontal" @select="handleSelect">
-                <el-menu-item index="1">设备管理</el-menu-item>
+            <el-menu theme="dark" default-active="1" class="ark-top-menu" mode="horizontal" @select="handleSelect" router>
+                <el-menu-item index="1" :index='$router.options.routes[0].indexPath'>设备管理</el-menu-item>
                 <el-submenu index="2">
                     <template slot="title">我的工作台</template>
                     <el-menu-item index="2-1">选项1</el-menu-item>
                     <el-menu-item index="2-2">选项2</el-menu-item>
                     <el-menu-item index="2-3">选项3</el-menu-item>
                 </el-submenu>
-                <el-menu-item index="3">订单管理</el-menu-item>
+                <el-menu-item index="/cie/about/devlog">关于这个东西</el-menu-item>
             </el-menu>
         </el-col>
         <el-col :span="1">
@@ -28,7 +28,10 @@
         name: 'arkheader',
         data() {
             return {
-                msg: 'header'
+                msg: 'header',
+                route: {
+
+                }
             }
         },
         props: {
@@ -42,7 +45,7 @@
     }
 </script>
 
-<style lang='scss'>
+<style lang='less'>
     .fade-enter-active,
 	.fade-leave-active {
 		transition: opacity .5s

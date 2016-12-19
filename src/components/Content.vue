@@ -3,17 +3,13 @@
 			<!--<el-col :span="4">-->
 			<aside style="width:230px;" >
 				<h5 class="admin"><i class="fa fa-user" aria-hidden="true" style="margin-right:5px;"></i>欢迎系统管理员：测试</h5>
-				<el-menu default-active="2" style="border-top: 1px solid #475669;" class="el-menu-vertical-demo" theme="dark">
-                    <el-submenu index="1">
-                        <template slot="title"><i class="el-icon-message"></i>导航一</template>
-                        <el-menu-item-group>
-                        <template slot="title">分组一</template>
-                        <el-menu-item index="1-1">选项1</el-menu-item>
+				<el-menu style="border-top: 1px solid #475669;" class="el-menu-vertical-demo" theme="dark" 
+                    default-active="hostlist"
+                    unique-opened router>
+                    <el-submenu index="1" router>
+                        <template slot="title"><i class="el-icon-message"></i>主机管理</template>
+                        <el-menu-item index='hostlist'>主机列表</el-menu-item>
                         <el-menu-item index="1-2">选项2</el-menu-item>
-                        </el-menu-item-group>
-                        <el-menu-item-group title="分组2">
-                        <el-menu-item index="1-3">选项3</el-menu-item>
-                        </el-menu-item-group>
                     </el-submenu>
                     <el-menu-item index="2"><i class="el-icon-menu"></i>导航二</el-menu-item>
                     <el-menu-item index="3"><i class="el-icon-setting"></i>导航三</el-menu-item>
@@ -32,9 +28,9 @@
 						</el-breadcrumb>
 					</el-col>
 					<el-col :span="24" style="background-color:#fff;box-sizing: border-box;">
-						<!--<transition name="fade">
+						<transition name="fade">
 							<router-view></router-view>
-						</transition>-->
+						</transition>
                         <div class="content"></div>
 
 					</el-col>
@@ -58,7 +54,7 @@
     }
 </script>
 
-<style lang="scss">
+<style lang="less">
     .arkContent {
 		background: #324057;
 		position: absolute;
@@ -80,7 +76,7 @@
             min-height:300px;
             
             .content {
-                min-height: 1024px;
+                min-height: 600px;
             }
         }
         
