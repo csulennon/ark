@@ -3,7 +3,7 @@
         <el-row class="host-option-panel">
             <el-col :span="18">
                 <el-button class="host-option__delete" icon="delete" @click="deleteSelectHost">删除选中</el-button>
-                <el-button class="host-option__add" icon="plus" @click="addHost">添加主机</el-button>
+                <el-button class="host-option__add" icon="plus" @click="showAddHostDialog">添加主机</el-button>
                 <el-button class="host-option__add" @click="refreshHostList"><i class="fa fa-repeat" style="padding-right: 8px"  ></i>刷新页面</el-button>
             </el-col>
             <el-col :span="6">
@@ -36,7 +36,7 @@
                     <el-col :span="3" class="host-item__host-disksize">{{hostItem.hostDiskSize}}G</el-col>
                     <el-col :span="3" class="host-item__host-option">
                         <el-row>
-                            <el-col :span="8" class="edit"><i class="el-icon-edit"></i></el-col>
+                            <el-col :span="8" class="edit"><i class="el-icon-edit" @click="showAddHostDialog"></i></el-col>
                             <el-col :span="8" class="refresh"><i class="fa fa-repeat"></i></el-col>
                             <el-col :span="8" class="delete"><i class="el-icon-delete2" @click="deleteOneHost(hostItem)"></i></el-col>
                         </el-row>
@@ -45,19 +45,51 @@
                 </el-row>
             </template>
             <el-row class="host-item-add">
-                <el-col :span="24"><i class="host-item-add__icon el-icon-plus"></i></el-col>
+                <el-col :span="24"><i class="host-item-add__icon el-icon-plus" @click="showAddHostDialog"></i></el-col>
             </el-row>
         </el-row>
 
-        <el-row class="host-add-dialog">
-            <el-dialog title="提示" v-model="hostAddVisible" size="tiny">
-                <span>这是一段信息</span>
-                <span slot="footer" class="dialog-footer">
-                    <el-button @click="hostAddVisible = false">取 消</el-button>
-                    <el-button type="primary" @click="hostAddVisible = false">确 定</el-button>
-                </span>
-            </el-dialog>
-        </el-row>    
+        <el-dialog class="host-add-dialog" title="添加主机" v-model="hostAddDialogVisible" size="tiny">
+            <el-form label-position="left" :model="addHostForm" :rules="hostAddRule" ref="addHostForm" label-width="90px">
+                <el-form-item label="主机名称" prop='hostName'>
+                    <el-input v-model="addHostForm.hostName"></el-input>
+                </el-form-item>
+                <el-form-item label="主机IP" prop='hostIp'>
+                    <el-input v-model="addHostForm.hostIp"></el-input>
+                </el-form-item>
+                <el-form-item label="用户名" prop='hostUsername'>
+                    <el-input v-model="addHostForm.hostUsername"></el-input>
+                </el-form-item>
+                <el-form-item label="密码" prop='hostPassword'>
+                    <el-input type="password" v-model="addHostForm.hostPassword"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="hostAddDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="doAddHost">确 定</el-button>
+            </span>
+        </el-dialog>
+
+        <el-dialog class="host-modify-dialog" title="修改主机" v-model="hostModifyDialogVisible" size="tiny">
+            <el-form label-position="left" :model="modifyHostForm" :rules="hostAddRule" ref="addHostForm" label-width="90px">
+                <el-form-item label="主机名称" prop='hostName'>
+                    <el-input v-model="modifyHostForm.hostName"></el-input>
+                </el-form-item>
+                <el-form-item label="主机IP" prop='hostIp'>
+                    <el-input v-model="modifyHostForm.hostIp"></el-input>
+                </el-form-item>
+                <el-form-item label="用户名" prop='hostUsername'>
+                    <el-input v-model="modifyHostForm.hostUsername"></el-input>
+                </el-form-item>
+                <el-form-item label="密码" prop='hostPassword'>
+                    <el-input type="password" v-model="modifyHostForm.hostPassword"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="hostModifyDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="doAddHost">确 定</el-button>
+            </span>
+        </el-dialog>
     </el-row>
 </template>
 
@@ -72,8 +104,24 @@
                 swal,
                 oldHostlist: [],
                 filterCondition: '',
-                hostAddVisible: false
-            }
+                hostAddDialogVisible: false,
+                hostModifyDialogVisible: false,
+                addHostForm: {
+                    hostName: '',
+                    hostIp: '',
+                    hostUsername: '',
+                    hostPassword: ''
+                },
+                hostAddRule: {
+                    hostName: [{ required: true, message: '请输入主机名', trigger: 'blur' },
+                        { min: 3, max: 16, message: '长度在 3 到 16 个字符', trigger: 'blur,change' }],
+                    hostIp: [{ required: true, message: '请输入活动名称', trigger: 'blur' }],
+                    hostUsername: [{ required: true, message: '请输入操作系统登录用户名', trigger: 'blur' },
+                        { min: 3, max: 16, message: '用户名长度在 3 到 16 个字符', trigger: 'blur,change' }],
+                    hostPassword: [{ required: true, message: '请输入操作系统登录密码', trigger: 'blur' },
+                        { min: 3, max: 16, message: '密码长度在 3 到 16 个字符', trigger: 'blur,change' }]
+                }
+            };
         },
         computed: {
             chckeAllStatus() {
@@ -156,8 +204,40 @@
                     return false;
                 });
             },
-            addHost() {
-                this.hostAddVisible = true;
+            showAddHostDialog() {
+                this.hostAddDialogVisible = true;
+            },
+            hostModifyDialogVisible() {
+                this.hostModifyDialogVisible = true;
+            },
+            doAddHost() {
+                this.$refs.addHostForm.validate((valid) => {
+                    if (valid) {
+                        // window.alert('submit!');
+                        let host = {};
+                        this.$set(host, 'id', new Date().getTime());
+                        this.$set(host, 'checked', false);
+                        this.$set(host, 'hostName', this.addHostForm.hostName);
+                        this.$set(host, 'hostIp', this.addHostForm.hostIp);
+                        this.$set(host, 'hostCpuusage', 0);
+                        this.$set(host, 'hostMemusage', 0);
+                        this.$set(host, 'hostMemSize', 0);
+                        this.$set(host, 'hostDiskSize', 0);
+                        this.$set(host, 'hostStatus', 0);
+                        this.hostlist.push(host);
+                        this.addHostForm = {
+                            hostName: '',
+                            hostIp: '',
+                            hostUsername: '',
+                            hostPassword: ''
+                        };
+
+                        this.hostAddDialogVisible = false;
+                    } else {
+                        // console.log('error submit!!');
+                        return false;
+                    }
+                });
             }
         },
         mounted() {
@@ -255,6 +335,13 @@
                 }
             }
         }  
+    }
+
+    .host-add-dialog {
+        .el-dialog__footer {
+            padding: 15px 0px 20px 15px;
+            text-align: center;
+        }
     }
 }
 </style>
