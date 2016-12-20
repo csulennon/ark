@@ -36,7 +36,7 @@
                     <el-col :span="3" class="host-item__host-disksize">{{hostItem.hostDiskSize}}G</el-col>
                     <el-col :span="3" class="host-item__host-option">
                         <el-row>
-                            <el-col :span="8" class="edit"><i class="el-icon-edit" @click="showAddHostDialog"></i></el-col>
+                            <el-col :span="8" class="edit"><i class="el-icon-edit" @click="hostModifyDialog(hostItem)"></i></el-col>
                             <el-col :span="8" class="refresh"><i class="fa fa-repeat"></i></el-col>
                             <el-col :span="8" class="delete"><i class="el-icon-delete2" @click="deleteOneHost(hostItem)"></i></el-col>
                         </el-row>
@@ -71,7 +71,7 @@
         </el-dialog>
 
         <el-dialog class="host-modify-dialog" title="修改主机" v-model="hostModifyDialogVisible" size="tiny">
-            <el-form label-position="left" :model="modifyHostForm" :rules="hostAddRule" ref="addHostForm" label-width="90px">
+            <el-form label-position="left" :model="modifyHostForm" :rules="hostModifyRule" ref="modifyHostForm" label-width="90px">
                 <el-form-item label="主机名称" prop='hostName'>
                     <el-input v-model="modifyHostForm.hostName"></el-input>
                 </el-form-item>
@@ -112,10 +112,25 @@
                     hostUsername: '',
                     hostPassword: ''
                 },
+                modifyHostForm: {
+                    hostName: '',
+                    hostIp: '',
+                    hostUsername: '',
+                    hostPassword: ''
+                },
                 hostAddRule: {
                     hostName: [{ required: true, message: '请输入主机名', trigger: 'blur' },
                         { min: 3, max: 16, message: '长度在 3 到 16 个字符', trigger: 'blur,change' }],
-                    hostIp: [{ required: true, message: '请输入活动名称', trigger: 'blur' }],
+                    hostIp: [{ required: true, message: '请输入主机IP', trigger: 'blur' }],
+                    hostUsername: [{ required: true, message: '请输入操作系统登录用户名', trigger: 'blur' },
+                        { min: 3, max: 16, message: '用户名长度在 3 到 16 个字符', trigger: 'blur,change' }],
+                    hostPassword: [{ required: true, message: '请输入操作系统登录密码', trigger: 'blur' },
+                        { min: 3, max: 16, message: '密码长度在 3 到 16 个字符', trigger: 'blur,change' }]
+                },
+                hostModifyRule: {
+                    hostName: [{ required: true, message: '请输入主机名', trigger: 'blur' },
+                        { min: 3, max: 16, message: '长度在 3 到 16 个字符', trigger: 'blur,change' }],
+                    hostIp: [{ required: true, message: '请输入主机IP', trigger: 'blur' }],
                     hostUsername: [{ required: true, message: '请输入操作系统登录用户名', trigger: 'blur' },
                         { min: 3, max: 16, message: '用户名长度在 3 到 16 个字符', trigger: 'blur,change' }],
                     hostPassword: [{ required: true, message: '请输入操作系统登录密码', trigger: 'blur' },
@@ -207,7 +222,8 @@
             showAddHostDialog() {
                 this.hostAddDialogVisible = true;
             },
-            hostModifyDialogVisible() {
+            hostModifyDialog(host) {
+                this.modifyHostForm = host;
                 this.hostModifyDialogVisible = true;
             },
             doAddHost() {
@@ -242,21 +258,21 @@
         },
         mounted() {
             let hosts = [
-                {id: 1, checked: false, hostName: '主机1', hostIp: '10.71.171.91', hostCpuusage: 20, hostMemusage: 20, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
-                {id: 2, checked: false, hostName: '主机2', hostIp: '10.71.171.91', hostCpuusage: 80, hostMemusage: 2, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
-                {id: 3, checked: false, hostName: '主机3', hostIp: '10.71.171.92', hostCpuusage: 50, hostMemusage: 20, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
-                {id: 4, checked: false, hostName: '主机4', hostIp: '10.71.171.93', hostCpuusage: 80, hostMemusage: 50, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
-                {id: 5, checked: false, hostName: '主机5', hostIp: '10.71.171.94', hostCpuusage: 60, hostMemusage: 40, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
-                {id: 6, checked: false, hostName: '主机6', hostIp: '10.71.171.95', hostCpuusage: 80, hostMemusage: 5, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
-                {id: 7, checked: false, hostName: '主机7', hostIp: '10.71.171.96', hostCpuusage: 82, hostMemusage: 20, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
-                {id: 8, checked: false, hostName: '主机8', hostIp: '10.71.171.97', hostCpuusage: 90, hostMemusage: 26, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
-                {id: 9, checked: false, hostName: '主机9', hostIp: '10.71.171.98', hostCpuusage: 20, hostMemusage: 22, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
-                {id: 10, checked: false, hostName: '主机10', hostIp: '10.71.171.98', hostCpuusage: 30, hostMemusage: 21, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
-                {id: 11, checked: false, hostName: '主机11', hostIp: '10.71.171.11', hostCpuusage: 50, hostMemusage: 20.9, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
-                {id: 12, checked: false, hostName: '主机12', hostIp: '10.71.171.21', hostCpuusage: 60, hostMemusage: 20, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
-                {id: 13, checked: false, hostName: '主机13', hostIp: '10.71.171.31', hostCpuusage: 82, hostMemusage: 20, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
-                {id: 14, checked: false, hostName: '主机14', hostIp: '10.71.171.41', hostCpuusage: 40, hostMemusage: 20, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
-                {id: 15, checked: false, hostName: '主机15', hostIp: '10.71.171.51', hostCpuusage: 1, hostMemusage: 20, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0}
+                {hostUsername: 'root', hostPassword: 'huawei123', id: 1, checked: false, hostName: '主机1', hostIp: '10.71.171.91', hostCpuusage: 20, hostMemusage: 20, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
+                {hostUsername: 'root', hostPassword: 'huawei123', id: 2, checked: false, hostName: '主机2', hostIp: '10.71.171.91', hostCpuusage: 80, hostMemusage: 2, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
+                {hostUsername: 'root', hostPassword: 'huawei123', id: 3, checked: false, hostName: '主机3', hostIp: '10.71.171.92', hostCpuusage: 50, hostMemusage: 20, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
+                {hostUsername: 'root', hostPassword: 'huawei123', id: 4, checked: false, hostName: '主机4', hostIp: '10.71.171.93', hostCpuusage: 80, hostMemusage: 50, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
+                {hostUsername: 'root', hostPassword: 'huawei123', id: 5, checked: false, hostName: '主机5', hostIp: '10.71.171.94', hostCpuusage: 60, hostMemusage: 40, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
+                {hostUsername: 'root', hostPassword: 'huawei123', id: 6, checked: false, hostName: '主机6', hostIp: '10.71.171.95', hostCpuusage: 80, hostMemusage: 5, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
+                {hostUsername: 'root', hostPassword: 'huawei123', id: 7, checked: false, hostName: '主机7', hostIp: '10.71.171.96', hostCpuusage: 82, hostMemusage: 20, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
+                {hostUsername: 'root', hostPassword: 'huawei123', id: 8, checked: false, hostName: '主机8', hostIp: '10.71.171.97', hostCpuusage: 90, hostMemusage: 26, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
+                {hostUsername: 'root', hostPassword: 'huawei123', id: 9, checked: false, hostName: '主机9', hostIp: '10.71.171.98', hostCpuusage: 20, hostMemusage: 22, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
+                {hostUsername: 'root', hostPassword: 'huawei123', id: 10, checked: false, hostName: '主机10', hostIp: '10.71.171.98', hostCpuusage: 30, hostMemusage: 21, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
+                {hostUsername: 'root', hostPassword: 'huawei123', id: 11, checked: false, hostName: '主机11', hostIp: '10.71.171.11', hostCpuusage: 50, hostMemusage: 20.9, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
+                {hostUsername: 'root', hostPassword: 'huawei123', id: 12, checked: false, hostName: '主机12', hostIp: '10.71.171.21', hostCpuusage: 60, hostMemusage: 20, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
+                {hostUsername: 'root', hostPassword: 'huawei123', id: 13, checked: false, hostName: '主机13', hostIp: '10.71.171.31', hostCpuusage: 82, hostMemusage: 20, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
+                {hostUsername: 'root', hostPassword: 'huawei123', id: 14, checked: false, hostName: '主机14', hostIp: '10.71.171.41', hostCpuusage: 40, hostMemusage: 20, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0},
+                {hostUsername: 'root', hostPassword: 'huawei123', id: 15, checked: false, hostName: '主机15', hostIp: '10.71.171.51', hostCpuusage: 1, hostMemusage: 20, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0}
             ]
             this.hostlist = hosts;
             this.oldHostlist = hosts;
