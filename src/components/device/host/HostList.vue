@@ -3,11 +3,11 @@
         <el-row class="host-option-panel">
             <el-col :span="18">
                 <el-button class="host-option__delete" icon="delete" @click="deleteSelectHost">删除选中</el-button>
-                <el-button class="host-option__add" icon="plus">添加主机</el-button>
+                <el-button class="host-option__add" icon="plus" @click="addHost">添加主机</el-button>
                 <el-button class="host-option__add" @click="refreshHostList"><i class="fa fa-repeat" style="padding-right: 8px"  ></i>刷新页面</el-button>
             </el-col>
             <el-col :span="6">
-                <el-input placeholder="请输入内容">
+                <el-input placeholder="请输入内容" v-model='filterCondition' @change='filterConditionchange'>
                     <template slot="append"><i class="host-option__search el-icon-search"></i></template>
                 </el-input>
             </el-col>
@@ -49,6 +49,15 @@
             </el-row>
         </el-row>
 
+        <el-row class="host-add-dialog">
+            <el-dialog title="提示" v-model="hostAddVisible" size="tiny">
+                <span>这是一段信息</span>
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="hostAddVisible = false">取 消</el-button>
+                    <el-button type="primary" @click="hostAddVisible = false">确 定</el-button>
+                </span>
+            </el-dialog>
+        </el-row>    
     </el-row>
 </template>
 
@@ -60,7 +69,10 @@
             return {
                 msg: 'HostList',
                 hostlist: [],
-                swal
+                swal,
+                oldHostlist: [],
+                filterCondition: '',
+                hostAddVisible: false
             }
         },
         computed: {
@@ -68,7 +80,9 @@
                 if (this.hostlist.length === 0) {
                     return false;
                 }
-                return this.hostlist.every((host) => { return host.checked === true });
+                return this.hostlist.every((host) => {
+                    return host.checked === true;
+                });
             }
         },
         methods: {
@@ -131,8 +145,19 @@
                 });
             },
             refreshHostList() {
-                console.log('go');
                 this.$router.replace('/cie/device/hostList?_=' + (new Date().getTime()));
+            },
+            filterConditionchange(data) {
+                let condition = this.filterCondition;
+                this.hostlist = this.oldHostlist.filter((host) => {
+                    if (host.hostName.indexOf(condition) >= 0 || host.hostIp.indexOf(condition) >= 0) {
+                        return true;
+                    }
+                    return false;
+                });
+            },
+            addHost() {
+                this.hostAddVisible = true;
             }
         },
         mounted() {
@@ -154,6 +179,7 @@
                 {id: 15, checked: false, hostName: '主机15', hostIp: '10.71.171.51', hostCpuusage: 1, hostMemusage: 20, hostMemSize: 10, hostDiskSize: 100, hostStatus: 0}
             ]
             this.hostlist = hosts;
+            this.oldHostlist = hosts;
         }
     }
 </script>
